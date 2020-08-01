@@ -21,6 +21,7 @@ final class RepositoryListViewStreamTests: XCTestCase {
 
         let repositories = WatchStack(testTarget.output.repositories)
         let reloadData = WatchStack(testTarget.output.reloadData.map { true }) // Voidだと比較できないのでBool化
+        let errorEvent = WatchStack(testTarget.output.errorEvent.map { true })
         let isRefreshControlRefreshing = WatchStack(testTarget.output.isRefreshControlRefreshing)
 
         // 初期状態
@@ -64,6 +65,38 @@ final class RepositoryListViewStreamTests: XCTestCase {
         XCTAssertEqual(repositories.value, [mockRepository])
         XCTAssertEqual(reloadData.events, [.next(true), .next(true)])
         XCTAssertEqual(isRefreshControlRefreshing.value, false)
+    }
+
+    func testCatchError() {
+        let testTarget = dependency.testTarget
+        let repositoryAction = dependency.repositoryAction
+
+        let repositories = WatchStack(testTarget.output.repositories)
+        let reloadData = WatchStack(testTarget.output.reloadData.map { true })
+        let errorEvent = WatchStack(testTarget.output.errorEvent.map { true })
+        let isRefreshing = WatchStack(testTarget.output.isRefreshControlRefreshing)
+
+        //初期
+        XCTAssertEqual(repositories.value, [])
+        XCTAssertEqual(reloadData.events, [])
+        XCTAssertEqual(errorEvent.events, [])
+        XCTAssertEqual(isRefreshing.value, false)
+
+        //viewWillAppear直後
+        testTarget.input.viewWillAppear(())
+
+        XCTAssertEqual(repositories.value, [])
+        XCTAssertEqual(reloadData.events, [])
+        XCTAssertEqual(errorEvent.events, [])
+        XCTAssertEqual(isRefreshing.value, true)
+
+        //エラーが返ってきた後
+        repositoryAction._fetchResult.accept(.error(APIError.internalServerError))
+
+        XCTAssertEqual(repositories.value, [])
+        XCTAssertEqual(reloadData.events, [])
+        XCTAssertEqual(errorEvent.events, [.next(true)])
+        XCTAssertEqual(isRefreshing.value, false)
     }
 }
 
