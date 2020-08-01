@@ -12,6 +12,12 @@ import Foundation
 internal enum L10n {
   /// 閉じる
   internal static let close = L10n.tr("Localizable", "Close")
+  /// エラー
+  internal static let error = L10n.tr("Localizable", "Error")
+  /// Ok
+  internal static let ok = L10n.tr("Localizable", "Ok")
+  /// エラーが発生しました。もう一度お試しください。
+  internal static let repositoryListErrorDescription = L10n.tr("Localizable", "RepositoryListErrorDescription")
 }
 // swiftlint:enable function_parameter_count identifier_name line_length type_body_length
 

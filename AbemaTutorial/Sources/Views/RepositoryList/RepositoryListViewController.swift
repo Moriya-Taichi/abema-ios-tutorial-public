@@ -38,6 +38,13 @@ final class RepositoryListViewController: UIViewController {
             .bind(to: refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
 
+        viewStream.output.errorEvent
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: {[weak self] _ in
+                self?.showAlert()
+            })
+            .disposed(by: disposeBag)
+
         refreshControl.rx.controlEvent(.valueChanged)
             .bind(to: viewStream.input.accept(for: \.refreshControlValueChanged))
             .disposed(by: disposeBag)
@@ -65,5 +72,22 @@ final class RepositoryListViewController: UIViewController {
         super.viewWillAppear(animated)
 
         viewStream.input.viewWillAppear(())
+    }
+}
+
+extension RepositoryListViewController {
+    private func showAlert() {
+        let alert = UIAlertController(title: L10n.error,
+                                      message: L10n.repositoryListErrorDescription,
+                                      preferredStyle: .alert)
+
+        let action = UIAlertAction(title: L10n.ok,
+                                   style: .default)
+        { [weak self] _ in
+            self?.viewStream.input.reloadEvent(())
+        }
+
+        alert.addAction(action)
+        self.present(alert, animated: true)
     }
 }

@@ -1,2 +1,5 @@
 // MARK: - Button
 "Close" = "閉じる";
+"Ok" = "Ok";
+"Error" = "エラー";
+"RepositoryListErrorDescription" = "エラーが発生しました。もう一度お試しください。";

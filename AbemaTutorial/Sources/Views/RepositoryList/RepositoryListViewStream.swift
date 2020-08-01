@@ -21,12 +21,14 @@ extension RepositoryListViewStream {
     struct Input: InputType {
         let viewWillAppear = PublishRelay<Void>()
         let refreshControlValueChanged = PublishRelay<Void>()
+        let reloadEvent = PublishRelay<Void>()
     }
 
     struct Output: OutputType {
         let repositories: BehaviorRelay<[Repository]>
         let reloadData: PublishRelay<Void>
         let isRefreshControlRefreshing: BehaviorRelay<Bool>
+        let errorEvent: PublishRelay<Void>
     }
 
     struct State: StateType {
@@ -51,28 +53,31 @@ extension RepositoryListViewStream {
 
         let viewWillAppear = dependency.inputObservables.viewWillAppear
         let refreshControlValueChanged = dependency.inputObservables.refreshControlValueChanged
+        let reloadEvent = dependency.inputObservables.reloadEvent
 
         let fetchRepositories = Observable
             .merge(viewWillAppear,
-                   refreshControlValueChanged)
+                   refreshControlValueChanged,
+                   reloadEvent)
 
         fetchRepositories
             .map { (limit: Const.count, offset: 0) }
-            .do(onNext: { _ in
-                state.isRefreshControlRefreshing.accept(true)
-            })
             .bind(to: fetchRepositoriesAction.inputs)
             .disposed(by: disposeBag)
 
         flux.repositoryStore.repositories.asObservable()
-            .do(onNext: { _ in
-                state.isRefreshControlRefreshing.accept(false)
-            })
             .bind(to: state.repositories)
             .disposed(by: disposeBag)
 
+        fetchRepositoriesAction.executing
+            .bind(to: state.isRefreshControlRefreshing)
+            .disposed(by: disposeBag)
+
+        let errorEvent = PublishRelay<Void>()
+
         fetchRepositoriesAction.errors
-            .subscribe(onNext: { error in print("API Error: \(error)") })
+            .map { _ in () }
+            .bind(to: errorEvent)
             .disposed(by: disposeBag)
 
         let reloadData = PublishRelay<Void>()
@@ -84,7 +89,8 @@ extension RepositoryListViewStream {
 
         return Output(repositories: state.repositories,
                       reloadData: reloadData,
-                      isRefreshControlRefreshing: state.isRefreshControlRefreshing)
+                      isRefreshControlRefreshing: state.isRefreshControlRefreshing,
+                      errorEvent: errorEvent)
     }
 }
 
