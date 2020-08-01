@@ -98,6 +98,44 @@ final class RepositoryListViewStreamTests: XCTestCase {
         XCTAssertEqual(errorEvent.events, [.next(true)])
         XCTAssertEqual(isRefreshing.value, false)
     }
+
+    func testReload() {
+         let testTarget = dependency.testTarget
+         let repositoryAction = dependency.repositoryAction
+         let repositoryStore = dependency.repositoryStore
+
+         let mockRepository = Repository.mock()
+
+         let repositories = WatchStack(testTarget.output.repositories)
+         let reloadData = WatchStack(testTarget.output.reloadData.map { true })
+         let errorEvent = WatchStack(testTarget.output.errorEvent.map { true })
+         let isRefreshing = WatchStack(testTarget.output.isRefreshControlRefreshing)
+
+         //初期
+         XCTAssertEqual(repositories.value, [])
+         XCTAssertEqual(reloadData.events, [])
+         XCTAssertEqual(errorEvent.events, [])
+         XCTAssertEqual(isRefreshing.value, false)
+
+         //viewWillAppear直後
+         testTarget.input.reloadEvent(())
+
+         XCTAssertEqual(repositories.value, [])
+         XCTAssertEqual(reloadData.events, [])
+         XCTAssertEqual(errorEvent.events, [])
+         XCTAssertEqual(isRefreshing.value, true)
+
+
+         //データが返ってきた後
+         repositoryAction._fetchResult.accept(.next(()))
+         repositoryAction._fetchResult.accept(.completed)
+         repositoryStore._repositories.accept([mockRepository])
+
+         XCTAssertEqual(repositories.value, [mockRepository])
+         XCTAssertEqual(reloadData.events, [.next(true)])
+         XCTAssertEqual(isRefreshing.value, false)
+         XCTAssertEqual(errorEvent.events, [])
+     }
 }
 
 extension RepositoryListViewStreamTests {
