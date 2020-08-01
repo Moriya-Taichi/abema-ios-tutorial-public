@@ -28,6 +28,7 @@ final class RepositoryListViewStreamTests: XCTestCase {
 
         XCTAssertEqual(repositories.value, [])
         XCTAssertEqual(reloadData.events, [])
+        XCTAssertEqual(errorEvent.events, [])
         XCTAssertEqual(isRefreshControlRefreshing.value, false)
 
         // viewWillAppearの後
@@ -36,6 +37,7 @@ final class RepositoryListViewStreamTests: XCTestCase {
 
         XCTAssertEqual(repositories.value, [])
         XCTAssertEqual(reloadData.events, [])
+        XCTAssertEqual(errorEvent.events, [])
         XCTAssertEqual(isRefreshControlRefreshing.value, true)
 
         // データが返ってきた後
@@ -46,6 +48,7 @@ final class RepositoryListViewStreamTests: XCTestCase {
 
         XCTAssertEqual(repositories.value, [mockRepository])
         XCTAssertEqual(reloadData.events, [.next(true)])
+        XCTAssertEqual(errorEvent.events, [])
         XCTAssertEqual(isRefreshControlRefreshing.value, false)
 
         // リフレッシュ後
@@ -54,6 +57,7 @@ final class RepositoryListViewStreamTests: XCTestCase {
 
         XCTAssertEqual(repositories.value, [mockRepository])
         XCTAssertEqual(reloadData.events, [.next(true)])
+        XCTAssertEqual(errorEvent.events, [])
         XCTAssertEqual(isRefreshControlRefreshing.value, true)
 
         // データが返ってきた後
@@ -64,6 +68,7 @@ final class RepositoryListViewStreamTests: XCTestCase {
 
         XCTAssertEqual(repositories.value, [mockRepository])
         XCTAssertEqual(reloadData.events, [.next(true), .next(true)])
+        XCTAssertEqual(errorEvent.events, [])
         XCTAssertEqual(isRefreshControlRefreshing.value, false)
     }
 
