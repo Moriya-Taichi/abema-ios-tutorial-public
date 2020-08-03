@@ -9,6 +9,7 @@ DerivedData
 *.xcodeproj
 
 # CocoaPods
+Pods/
 Pods/SwiftGen
 
 # Carthage
