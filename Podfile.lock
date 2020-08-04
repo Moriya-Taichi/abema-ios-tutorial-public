@@ -1,16 +1,22 @@
 PODS:
+  - GRDB.swift (4.14.0):
+    - GRDB.swift/standard (= 4.14.0)
+  - GRDB.swift/standard (4.14.0)
   - SwiftGen (6.0.0)
 
 DEPENDENCIES:
+  - GRDB.swift (= 4.14.0)
   - SwiftGen (= 6.0.0)
 
 SPEC REPOS:
   trunk:
+    - GRDB.swift
     - SwiftGen
 
 SPEC CHECKSUMS:
+  GRDB.swift: 8cc3ab7c8b8b4ac1761deb8dca4b51c1c9d429f8
   SwiftGen: cd0bb0c9838c3fc90b78d35b19f492711b19eb55
 
-PODFILE CHECKSUM: b932d138128deaf91aa29319778cadc546594999
+PODFILE CHECKSUM: 078068133b08978935d94bd29331c0938fb210d2
 
 COCOAPODS: 1.9.1
